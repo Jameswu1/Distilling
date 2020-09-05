@@ -94,9 +94,9 @@ class Net(nn.Module):
     def __init__(self, encoder, decoder, residual):
         super(Net, self).__init__()
         enc_layers = list(encoder.children())
-        self.enc_1 = nn.Sequential(*enc_layers[3:4])  # input -> relu1_1
-        self.enc_2 = nn.Sequential(*enc_layers[10:11])  # relu1_1 -> relu2_1
-        self.enc_3 = nn.Sequential(*enc_layers[17:18])  # relu2_1 -> relu3_1
+        #self.enc_1 = nn.Sequential(*enc_layers[3:4])  # input -> relu1_1
+        #self.enc_2 = nn.Sequential(*enc_layers[10:11])  # relu1_1 -> relu2_1
+        #self.enc_3 = nn.Sequential(*enc_layers[17:18])  # relu2_1 -> relu3_1
         self.enc_4 = nn.Sequential(*enc_layers[30:31])  # relu3_1 -> relu4_1
         self.res_1 = residual
         self.res_2 = residual
@@ -105,36 +105,27 @@ class Net(nn.Module):
         self.mse_loss = nn.MSELoss()
 
         # fix the encoder
-        for name in ['enc_1', 'enc_2', 'enc_3', 'enc_4']:
+        #for name in ['enc_1', 'enc_2', 'enc_3', 'enc_4']:
+        for name in ['enc_4']:
             for param in getattr(self, name).parameters():
                 param.requires_grad = False
 
     # extract relu1_1, relu2_1, relu3_1, relu4_1 from input image
     def encode_with_intermediate(self, input):
         results = [input]
-        for i in range(4):
-            func = getattr(self, 'enc_{:d}'.format(i + 1))
-            results.append(func(results[-1]))
+        #for i in range(4):
+        #    func = getattr(self, 'enc_{:d}'.format(i + 1))
+        #    results.append(func(results[-1]))
+        func = getattr(self, 'enc_{:d}'.format(4 + 1))
+        results.append(func(results[-1]))
         return results[1:]
 
     # extract relu4_1 from input image
     def encode(self, input):
-        for i in range(4):
-            input = getattr(self, 'enc_{:d}'.format(i + 1))(input)
+        #for i in range(4):
+        #    input = getattr(self, 'enc_{:d}'.format(i + 1))(input)
+        input = getattr(self, 'enc_{:d}'.format(3 + 1))(input)
         return input
-
-    def calc_content_loss(self, input, target):
-        assert (input.size() == target.size())
-        assert (target.requires_grad is False)
-        return self.mse_loss(input, target)
-
-    def calc_style_loss(self, input, target):
-        assert (input.size() == target.size())
-        assert (target.requires_grad is False)
-        input_mean, input_std = calc_mean_std(input)
-        target_mean, target_std = calc_mean_std(target)
-        return self.mse_loss(input_mean, target_mean) + \
-               self.mse_loss(input_std, target_std)
 
     def forward(self, content, target):
         print(content.size())
