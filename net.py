@@ -94,10 +94,10 @@ class Net(nn.Module):
     def __init__(self, encoder, decoder, residual):
         super(Net, self).__init__()
         enc_layers = list(encoder.children())
-        self.enc_1 = nn.Sequential(*enc_layers[3:4])  # input -> relu1_1
-        self.enc_2 = nn.Sequential(*enc_layers[10:11])  # relu1_1 -> relu2_1
-        self.enc_3 = nn.Sequential(*enc_layers[17:18])  # relu2_1 -> relu3_1
-        self.enc_4 = nn.Sequential(*enc_layers[30:31])  # relu3_1 -> relu4_1
+        self.enc_1 = nn.Sequential(*enc_layers[0:4])  # input -> relu1_1
+        self.enc_2 = nn.Sequential(*enc_layers[4:11])  # relu1_1 -> relu2_1
+        self.enc_3 = nn.Sequential(*enc_layers[11:18])  # relu2_1 -> relu3_1
+        self.enc_4 = nn.Sequential(*enc_layers[18:31])  # relu3_1 -> relu4_1
         self.res_1 = residual
         self.res_2 = residual
         self.res_3 = residual
